@@ -3,14 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { FaChartBar, FaQuoteRight, FaAddressBook, FaBoxes, FaTruck } from 'react-icons/fa';
+import { FaChartBar, FaQuoteRight, FaAddressBook, FaUser, FaTruck } from 'react-icons/fa';
 
 const navItems = [
   { name: 'Overview', href: '/dashboard', icon: FaChartBar },
   { name: 'Quotes', href: '/dashboard/quotes', icon: FaQuoteRight },
   { name: 'Contacts', href: '/dashboard/contacts', icon: FaAddressBook },
+  { name: 'Users', href: '/dashboard/users', icon: FaUser },
 //   { name: 'Inventory', href: '/dashboard/inventory', icon: FaBoxes },
   { name: 'Shipments', href: '/dashboard/shipments', icon: FaTruck },
+
 ];
 
 export default function DashboardLayout({ children }) {

@@ -7,7 +7,7 @@ const ServicePage = () => {
   return (
 
     <Fade bottom duration={1000} distance="10%">
-    <section className="container-xxl py-3 md:py-7">
+    <section className="flex min-h-screen flex-col items-center justify-between p-3 md:p-8 w-11/12 m-auto">
       
       <div className="container py-20">
         <div className="text-center wow fadeInUp">

@@ -5,7 +5,7 @@ import { FaGlobe, FaShippingFast } from 'react-icons/fa';
 
 const About = () => {
   return (
-    <section className="container-fluid overflow-hidden py-3 md:py-7 px-lg-0">
+    <section className="flex min-h-screen flex-col items-center justify-between p-3 md:p-8 w-11/12 m-auto">
       <div className="container about py-20 px-lg-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           <div className="wow fadeInLeft">

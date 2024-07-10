@@ -1,4 +1,4 @@
-import ContactsList from '../ContactsList';
+import ContactsList from './ContactsList';
 import clientPromise from "@/lib/mongodb";
 import { notFound } from 'next/navigation';
 

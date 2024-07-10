@@ -1,72 +1,66 @@
-import { NextResponse } from "next/server";
+// app/api/quotes/route.js
+import { NextResponse } from 'next/server';
 import clientPromise from "@/lib/mongodb";
+import { ObjectId } from 'mongodb';
+import { verifyToken } from '@/lib/auth';
 
 export async function POST(request) {
   try {
+    const token = request.headers.get('Authorization')?.split(' ')[1];
+    if (!token) {
+      return NextResponse.json({ error: "No token provided" }, { status: 401 });
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    const { name, email, mobile, freight, note } = await request.json();
+
     const client = await clientPromise;
     const db = client.db("afridb");
 
-    console.log("Accessing MongoDB for quote submission");
-
-    const body = await request.json();
-    const { name, email, mobile, freight, note } = body;
-
-    // Validate the input
-    if (!name || !email || !mobile || !freight) {
-      return NextResponse.json(
-        { message: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
-    // Insert the quote request into MongoDB
     const result = await db.collection("quotes").insertOne({
+      userId: new ObjectId(decoded.userId),
       name,
       email,
       mobile,
       freight,
       note,
-      createdAt: new Date(),
+      createdAt: new Date()
     });
 
-    console.log("Quote request saved with ID:", result.insertedId, {
-      name,
-      email,
-      mobile,
-      freight,
-      note,
-    });
-
-    return NextResponse.json(
-      { message: "Quote request received and saved successfully" },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "Quote submitted successfully", quoteId: result.insertedId.toString() }, { status: 201 });
   } catch (error) {
-    console.error("Error processing quote request:", error);
-    // if (error.code) console.error("Error code:", error.code);
-    // if (error.codeName) console.error("Error codeName:", error.codeName);
-    // if (error.errorLabels) console.error("Error labels:", error.errorLabels);
-    return NextResponse.json(
-      { message: "Error processing quote request", error: error.message },
-      { status: 500 }
-    );
+    console.error("Error submitting quote:", error);
+    return NextResponse.json({ error: "An error occurred while submitting the quote" }, { status: 500 });
   }
 }
 
-export async function GET() {
+export async function GET(request) {
   try {
+    const token = request.headers.get('Authorization')?.split(' ')[1];
+    if (!token) {
+      return NextResponse.json({ error: "No token provided" }, { status: 401 });
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
     const client = await clientPromise;
     const db = client.db("afridb");
-    const quotes = await db.collection("quotes").find({}).toArray();
-    return NextResponse.json({ quotes }, { status: 200 });
+
+    const quotes = await db.collection("quotes")
+      .find({ userId: new ObjectId(decoded.userId) })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    return NextResponse.json({ quotes: quotes.map(quote => ({...quote, id: quote._id.toString()})) });
   } catch (error) {
-    console.log("error fetching data", error);
-    return NextResponse.json(
-      {
-        message: "error fetching quotes",
-        error: error.message,
-      },
-      { status: 500 }
-    );
+    console.error("Error fetching quotes:", error);
+    return NextResponse.json({ error: "An error occurred while fetching quotes" }, { status: 500 });
   }
 }
